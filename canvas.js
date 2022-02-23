@@ -37,6 +37,14 @@ function drawline(e) {
         ctx.stroke(); 
     }
 
+    if (e.buttons == 2) {
+      const imageDatas = ctx.createImageData(dimension, dimension);
+      const colorGrid = new ColorGrid(dimension, dimension);
+      imageDatas.data.set(Uint8ClampedArray.from(colorGrid.getColorArray()));
+      ctx.putImageData(imageDatas, 0, 0);
+    }
+
+
     setMouse(e);
 }
 
@@ -51,6 +59,3 @@ function noMouse() {
     mouse.x = undefined,
     mouse.y = undefined
 }
-
-// 2 * 2 matrix color grid, used for all draw operations
-// at the end of operation/frame, draw it with draw image
