@@ -38,12 +38,12 @@ function drawline(e) {
     }
 
     if (e.buttons == 2) {
-      const imageDatas = ctx.createImageData(dimension, dimension);
+      const imageData = ctx.createImageData(dimension, dimension);
       const colorGrid = new ColorGrid(dimension, dimension);
-      imageDatas.data.set(Uint8ClampedArray.from(colorGrid.getColorArray()));
-      ctx.putImageData(imageDatas, 0, 0);
+      imageData.data.set(Uint8ClampedArray.from(colorGrid.getColorArray()));
+      console.log(imageData);
+      ctx.putImageData(imageData, 0, 0);
     }
-
 
     setMouse(e);
 }
