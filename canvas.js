@@ -1,4 +1,7 @@
-// Canvas Variables
+
+// ******************* Script Begin *******************
+
+// Initialize canvas
 const canvas = document.getElementById('powder_canvas');
 const ctx = canvas.getContext('2d');
 const dimension = 300;
@@ -6,46 +9,35 @@ canvas.width = dimension;
 canvas.height = dimension;
 
 // Global Variables
+const palett = {
+  white: [255, 255, 255, 255]
+}
 const mouse = {
     x: undefined,
     y: undefined,
-    size: 20
+    size: 5,
+    color: palett.white
 }
+const imageData = ctx.createImageData(dimension, dimension);
+const colorGrid = new ColorGrid(dimension, dimension);
 
-// Mouse events on canvas below:
+paintCanvas(canvas);
 canvas.addEventListener('mousedown', drawline)
-
 canvas.addEventListener('mousemove', drawline);
 
-canvas.addEventListener('mouseleave', noMouse);
+// ******************* Script End *******************
 
+// ******************* Helper Functions *******************
 // Draw line based on mouse position
 function drawline(e) {
     
-    ctx.lineCap = 'round';
-    ctx.lineWidth = mouse.size;
-    ctx.strokeStyle = '#C2B280'
-
-    if (typeof mouse.x === 'undefined') {
-        setMouse(e);
-    }
+    setMouse(e);
 
     if (e.buttons == 1) {
-        ctx.beginPath();
-        ctx.moveTo(mouse.x, mouse.y);
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke(); 
+      const penOffset = Math.floor(mouse.size / 2);
+      colorGrid.setSquare(e.offsetX - penOffset, e.offsetY - penOffset, mouse.size, mouse.color);
+      paintCanvas();
     }
-
-    if (e.buttons == 2) {
-      const imageData = ctx.createImageData(dimension, dimension);
-      const colorGrid = new ColorGrid(dimension, dimension);
-      imageData.data.set(Uint8ClampedArray.from(colorGrid.getColorArray()));
-      console.log(imageData);
-      ctx.putImageData(imageData, 0, 0);
-    }
-
-    setMouse(e);
 }
 
 // Set mouse position on global variable
@@ -54,8 +46,15 @@ function setMouse(e) {
     mouse.y = e.offsetY;
 }
 
+function paintCanvas() {
+  imageData.data.set(colorGrid.getColorArray());
+  ctx.putImageData(imageData, 0, 0);
+}
+
 // Reset the mouse to default
 function noMouse() {
     mouse.x = undefined,
     mouse.y = undefined
 }
+
+// ******************* End Helper Functions *******************
