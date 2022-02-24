@@ -8,13 +8,18 @@ class ColorGrid {
     this.resetGrid();
   }
 
+  // Get the pixel at location xy
+  getPixel(x, y) {
+    return this.grid[y][x];
+  }
+
   // Initializes "grid" field into a 2D array. The elements of the 2D array is an array of length 4, representing RGBA colors
   resetGrid() {
     this.grid.length = this.height;
 
     for (let i = 0; i < this.grid.length; i++) {
 
-      const colorBlack = [0, 0, 0, 255];
+      const colorBlack = [0, 0, 0, 255, 0];
       const row = new Array(this.width);
 
       for (let j = 0; j < row.length; j ++) {
