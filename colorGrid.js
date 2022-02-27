@@ -2,10 +2,27 @@ class ColorGrid {
 
   grid = new Array(); 
 
-  constructor(height, width) {
+  constructor(height, width, emptyColor) {
     this.height = height;
     this.width = width;
+    this.emptyColor = emptyColor;
     this.resetGrid();
+  }
+
+  // Check if an xy location is in bounds
+  isInBounds(x, y) {
+    return x >= 0 && x < this.width && y >= 0 && y < this.height;
+  }
+
+  // Check if cell is empty
+  isEmpty(x, y) {
+    return this.isInBounds(x, y) && this.isColor(x, y, this.emptyColor);
+  }
+
+
+  // Check if a color is a certain color by id
+  isColor(x, y, color) {
+    return this.getPixel(x, y)[4] == color[4];
   }
 
   // Get the pixel at location xy
@@ -19,11 +36,10 @@ class ColorGrid {
 
     for (let i = 0; i < this.grid.length; i++) {
 
-      const colorBlack = [0, 0, 0, 255, 0];
       const row = new Array(this.width);
 
-      for (let j = 0; j < row.length; j ++) {
-        row[j] = colorBlack;
+      for (let j = 0; j < row.length; j++) {
+        row[j] = this.emptyColor;
       }
 
       this.grid[i] = row;
@@ -45,7 +61,7 @@ class ColorGrid {
 
   // Set a single pixel in the grid using xy location and color
   setPixel(x, y, color) {
-    if (x >= 0 && x < 300 && y >= 0 && y < 300) {
+    if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
       this.grid[y][x] = color;
     }
   } 
