@@ -10,23 +10,18 @@ canvas.height = canvasDimension;
 ctx.imageSmoothingEnabled = false;
 
 // Global Variables
-const palett = {
-  water: [30, 130, 190, 255, 2],
-  sand: [190, 180, 130, 255, 1],
-  empty: [0, 0, 0, 255, 0]
-}
 const mouse = {
     down: false,
     x: undefined,
     y: undefined,
     size: 5,
-    color: palett.sand
+    colorId: element.sand.id
 }
 const gridDimension = 100;
 const imageData = ctx.createImageData(gridDimension, gridDimension);
-const colorGrid = new ColorGrid(gridDimension, gridDimension, palett.empty);
-
+const colorGrid = new ColorGrid(gridDimension, gridDimension);
 paintCanvas(canvas);
+
 canvas.addEventListener('mousedown', toggleMouseDown);
 canvas.addEventListener('mouseup', toggleMouseUp);
 canvas.addEventListener('mouseleave', toggleMouseUp);
@@ -34,14 +29,13 @@ canvas.addEventListener('mousemove', setMouse);
 document.addEventListener('keypress', function(e) {
   switch (e.key) {
     case 's':
-      console.log('pressed');
-      mouse.color = palett.sand;
+      mouse.colorId = element.sand.id;
       break;
     case 'w':
-      mouse.color = palett.water;
+      mouse.colorId = element.water.id;
       break;
     case 'e':
-      mouse.color = palett.empty;
+      mouse.colorId = element.empty.id;
       break;
   }
 });
@@ -63,68 +57,80 @@ function updateGrid() {
     drawSquare();
   }
   const dir = Math.random() < 0.5 ? 1 : -1;
-  for (let y = gridDimension - 2; y >= 0; y--) {
+  for (let y = 0; y < gridDimension; y++) {
+  //for (let y = gridDimension - 1; y >= 0; y--) {
     for (let x = 0; x < gridDimension; x++) {
-      if (colorGrid.isColor(x, y, palett.sand)) {
-        const bottom = colorGrid.isEmpty(x, y + 1)
-        const botLeft = colorGrid.isEmpty(x - 1, y + 1);
-        const botRight = colorGrid.isEmpty(x + 1, y + 1);
-        if (bottom) {
-          colorGrid.setPixel(x, y, palett.empty);
-          colorGrid.setPixel(x, y + 1, palett.sand)
-        } else {
-          if (botLeft && botRight ) {
-            colorGrid.setPixel(x, y, palett.empty);
-            colorGrid.setPixel(x + dir, y + 1, palett.sand);
-          } else if (botLeft) {
-            colorGrid.setPixel(x, y, palett.empty);
-            colorGrid.setPixel(x - 1, y + 1, palett.sand);
-          } else if (botRight) {
-            colorGrid.setPixel(x, y, palett.empty);
-            colorGrid.setPixel(x + 1, y + 1, palett.sand);
-          }
-        }
+      switch (colorGrid.getPixel(x, y)) {
+        case 1:
+          handleSand(x, y, dir);
+          break;
+        case 2:
+          handleWater(x, y, dir);
+          break;
       }
-      // if (colorGrid.isColor(x, y, palett.water)) {
-      //   const bottom = colorGrid.isEmpty(x, y + 1)
-      //   const botLeft = colorGrid.isEmpty(x - 1, y + 1);
-      //   const botRight = colorGrid.isEmpty(x + 1, y + 1);
-      //   const left = colorGrid.isEmpty(x - 1, y);
-      //   const right = colorGrid.isEmpty(x + 1, y);
-      //   if (bottom) {
-      //     colorGrid.setPixel(x, y, palett.empty);
-      //     colorGrid.setPixel(x, y + 1, palett.water)
-      //   } else if (botLeft || botRight) {
-      //     if (botLeft && botRight ) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + dir, y + 1, palett.water);
-      //     } else if (botLeft) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x - 1, y + 1, palett.water);
-      //     } else if (botRight) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + 1, y + 1, palett.water);
-      //     }
-      //   } else {
-      //     if (left && right) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + dir, y, palett.water);
-      //     } else if (left) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x - 1, y, palett.water);
-      //     } else if (right) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + 1, y, palett.water);
-      //     }
-      //   }
-      // }
+      
+    }
+  }
+}
+
+function handleSand(x, y, dir) {
+  const bottom = colorGrid.isEmpty(x, y + 1)
+  const botLeft = colorGrid.isEmpty(x - 1, y + 1);
+  const botRight = colorGrid.isEmpty(x + 1, y + 1);
+  if (bottom) {
+    colorGrid.setPixel(x, y, element.empty.id);
+    colorGrid.setPixel(x, y + 1, element.sand.id)
+  } else {
+    if (botLeft && botRight ) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x + dir, y + 1, element.sand.id);
+    } else if (botLeft) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x - 1, y + 1, element.sand.id);
+    } else if (botRight) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x + 1, y + 1, element.sand.id);
+    }
+  }
+}
+
+function handleWater(x, y, dir) {
+  const bottom = colorGrid.isEmpty(x, y + 1)
+  const botLeft = colorGrid.isEmpty(x - 1, y + 1);
+  const botRight = colorGrid.isEmpty(x + 1, y + 1);
+  const left = colorGrid.isEmpty(x - 1, y);
+  const right = colorGrid.isEmpty(x + 1, y);
+  if (bottom) {
+    colorGrid.setPixel(x, y, element.empty.id);
+    colorGrid.setPixel(x, y + 1, element.water.id)
+  } else if (botLeft || botRight) {
+    if (botLeft && botRight ) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x + dir, y + 1, element.water.id);
+    } else if (botLeft) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x - 1, y + 1, element.water.id);
+    } else if (botRight) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x + 1, y + 1, element.water.id);
+    }
+  } else {
+    if (left && right) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x + dir, y, element.water.id);
+    } else if (left) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x - 1, y, element.water.id);
+    } else if (right) {
+      colorGrid.setPixel(x, y, element.empty.id);
+      colorGrid.setPixel(x + 1, y, element.water.id);
     }
   }
 }
 
 function drawSquare(e) {
     const penOffset = Math.floor(mouse.size / 2);
-    colorGrid.setSquare(mouse.x - penOffset, mouse.y - penOffset, mouse.size, mouse.color);
+    colorGrid.setSquare(mouse.x - penOffset, mouse.y - penOffset, mouse.size, mouse.colorId);
 }
 
 function setMouse(e) {
