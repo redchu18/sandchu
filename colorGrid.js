@@ -1,27 +1,29 @@
 class ColorGrid {
 
+  readGrid = new Array();
   grid = new Array(); 
 
   constructor(height, width) {
     this.height = height;
     this.width = width;
     this.resetGrid();
+    this.readyReadGrid();
   }
 
-  // Check if an xy location is in bounds
-  isInBounds(x, y) {
-    return x >= 0 && x < this.width && y >= 0 && y < this.height;
+  // Ready read only grid
+  readyReadGrid() {
+    this.readGrid = this.grid.map((row) => row.slice());
+  }
+
+  // Get pixel from read grid
+  getReadGridPixel(x, y) {
+    return this.readGrid[y][x];
   }
 
   // Check if cell is empty
   isEmpty(x, y) {
-    return this.isInBounds(x, y) && this.isColor(x, y, element.empty.id);
-  }
-
-
-  // Check if a color is a certain color by id
-  isColor(x, y, colorId) {
-    return this.getPixel(x, y) == colorId;
+    const isInBounds = x >= 0 && x < this.width && y >= 0 && y < this.height;
+    return isInBounds && this.getPixel(x, y) == element.empty.id;
   }
 
   // Get the pixel at location xy
@@ -80,6 +82,9 @@ class ColorGrid {
             break;
           case 2:
             colorArray.push(...element.water.color);
+            break;
+          case 3:
+            colorArray.push(...element.rock.color);
             break;
         }
       })

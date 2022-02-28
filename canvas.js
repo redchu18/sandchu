@@ -14,10 +14,13 @@ const mouse = {
     down: false,
     x: undefined,
     y: undefined,
-    size: 5,
+    size: 1,
     colorId: element.sand.id
 }
-const gridDimension = 100;
+const gameState = {
+  pause: false
+}
+const gridDimension = 20;
 const imageData = ctx.createImageData(gridDimension, gridDimension);
 const colorGrid = new ColorGrid(gridDimension, gridDimension);
 paintCanvas(canvas);
@@ -37,6 +40,22 @@ document.addEventListener('keypress', function(e) {
     case 'e':
       mouse.colorId = element.empty.id;
       break;
+    case 'r':
+      mouse.colorId = element.rock.id;
+      break;
+    case 'p':
+      if (gameState.pause) {
+        gameState.pause = false;
+        animate();
+      } else {
+        gameState.pause = true;
+      }
+      break;
+    case ' ':
+      if (gameState.pause) {
+        stepFrame();
+      }
+      break;
   }
 });
 
@@ -44,11 +63,21 @@ document.addEventListener('keypress', function(e) {
 animate();
 
 // ******************* Animation *******************
-function animate() {
-  requestAnimationFrame(animate);
+function stepFrame() {
+  colorGrid.readyReadGrid();
   updateGrid();
   paintCanvas();
 }
+
+function animate() {
+  if (gameState.pause) {
+    return;
+  }
+  stepFrame();
+  requestAnimationFrame(animate);
+}
+
+
 
 // ******************* Helper Functions *******************
 // Update the grid to the next frame
@@ -58,9 +87,9 @@ function updateGrid() {
   }
   const dir = Math.random() < 0.5 ? 1 : -1;
   for (let y = 0; y < gridDimension; y++) {
-  //for (let y = gridDimension - 1; y >= 0; y--) {
+  // for (let y = gridDimension - 1; y >= 0; y--) {
     for (let x = 0; x < gridDimension; x++) {
-      switch (colorGrid.getPixel(x, y)) {
+      switch (colorGrid.getReadGridPixel(x, y)) {
         case 1:
           handleSand(x, y, dir);
           break;

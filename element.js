@@ -1,4 +1,8 @@
 const element = {
+  rock: {
+    id: 3,
+    color: [105, 105, 105, 255]
+  },
   water: {
     id: 2,
     color: [30, 130, 190, 255],
