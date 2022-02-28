@@ -19,10 +19,10 @@ const mouse = {
     down: false,
     x: undefined,
     y: undefined,
-    size: 5,
+    size: 1,
     color: palett.sand
 }
-const gridDimension = 100;
+const gridDimension = 10;
 const imageData = ctx.createImageData(gridDimension, gridDimension);
 const colorGrid = new ColorGrid(gridDimension, gridDimension, palett.empty);
 
@@ -52,6 +52,7 @@ animate();
 // ******************* Animation *******************
 function animate() {
   requestAnimationFrame(animate);
+  colorGrid.readyReadGrid();
   updateGrid();
   paintCanvas();
 }
@@ -65,59 +66,59 @@ function updateGrid() {
   const dir = Math.random() < 0.5 ? 1 : -1;
   for (let y = gridDimension - 2; y >= 0; y--) {
     for (let x = 0; x < gridDimension; x++) {
-      if (colorGrid.isColor(x, y, palett.sand)) {
-        const bottom = colorGrid.isEmpty(x, y + 1)
-        const botLeft = colorGrid.isEmpty(x - 1, y + 1);
-        const botRight = colorGrid.isEmpty(x + 1, y + 1);
-        if (bottom) {
-          colorGrid.setPixel(x, y, palett.empty);
-          colorGrid.setPixel(x, y + 1, palett.sand)
-        } else {
-          if (botLeft && botRight ) {
-            colorGrid.setPixel(x, y, palett.empty);
-            colorGrid.setPixel(x + dir, y + 1, palett.sand);
-          } else if (botLeft) {
-            colorGrid.setPixel(x, y, palett.empty);
-            colorGrid.setPixel(x - 1, y + 1, palett.sand);
-          } else if (botRight) {
-            colorGrid.setPixel(x, y, palett.empty);
-            colorGrid.setPixel(x + 1, y + 1, palett.sand);
-          }
-        }
-      }
-      // if (colorGrid.isColor(x, y, palett.water)) {
-      //   const bottom = colorGrid.isEmpty(x, y + 1)
-      //   const botLeft = colorGrid.isEmpty(x - 1, y + 1);
-      //   const botRight = colorGrid.isEmpty(x + 1, y + 1);
-      //   const left = colorGrid.isEmpty(x - 1, y);
-      //   const right = colorGrid.isEmpty(x + 1, y);
+      // if (colorGrid.isReadGridColor(x, y, palett.sand)) {
+      //   const bottom = colorGrid.isWriteGridEmpty(x, y + 1)
+      //   const botLeft = colorGrid.isWriteGridEmpty(x - 1, y + 1);
+      //   const botRight = colorGrid.isWriteGridEmpty(x + 1, y + 1);
       //   if (bottom) {
-      //     colorGrid.setPixel(x, y, palett.empty);
-      //     colorGrid.setPixel(x, y + 1, palett.water)
-      //   } else if (botLeft || botRight) {
-      //     if (botLeft && botRight ) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + dir, y + 1, palett.water);
-      //     } else if (botLeft) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x - 1, y + 1, palett.water);
-      //     } else if (botRight) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + 1, y + 1, palett.water);
-      //     }
+      //     colorGrid.setWriteGridPixel(x, y, palett.empty);
+      //     colorGrid.setWriteGridPixel(x, y + 1, palett.sand)
       //   } else {
-      //     if (left && right) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + dir, y, palett.water);
-      //     } else if (left) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x - 1, y, palett.water);
-      //     } else if (right) {
-      //       colorGrid.setPixel(x, y, palett.empty);
-      //       colorGrid.setPixel(x + 1, y, palett.water);
+      //     if (botLeft && botRight ) {
+      //       colorGrid.setWriteGridPixel(x, y, palett.empty);
+      //       colorGrid.setWriteGridPixel(x + dir, y + 1, palett.sand);
+      //     } else if (botLeft) {
+      //       colorGrid.setWriteGridPixel(x, y, palett.empty);
+      //       colorGrid.setWriteGridPixel(x - 1, y + 1, palett.sand);
+      //     } else if (botRight) {
+      //       colorGrid.setWriteGridPixel(x, y, palett.empty);
+      //       colorGrid.setWriteGridPixel(x + 1, y + 1, palett.sand);
       //     }
       //   }
       // }
+      if (colorGrid.isReadGridColor(x, y, palett.water)) {
+        const bottom = colorGrid.isWriteGridEmpty(x, y + 1)
+        const botLeft = colorGrid.isWriteGridEmpty(x - 1, y + 1);
+        const botRight = colorGrid.isWriteGridEmpty(x + 1, y + 1);
+        const left = colorGrid.isWriteGridEmpty(x - 1, y);
+        const right = colorGrid.isWriteGridEmpty(x + 1, y);
+        if (bottom) {
+          colorGrid.setWriteGridPixel(x, y, palett.empty);
+          colorGrid.setWriteGridPixel(x, y + 1, palett.water)
+        } else if (botLeft || botRight) {
+          if (botLeft && botRight ) {
+            colorGrid.setWriteGridPixel(x, y, palett.empty);
+            colorGrid.setWriteGridPixel(x + dir, y + 1, palett.water);
+          } else if (botLeft) {
+            colorGrid.setWriteGridPixel(x, y, palett.empty);
+            colorGrid.setWriteGridPixel(x - 1, y + 1, palett.water);
+          } else if (botRight) {
+            colorGrid.setWriteGridPixel(x, y, palett.empty);
+            colorGrid.setWriteGridPixel(x + 1, y + 1, palett.water);
+          }
+        } else {
+          if (left && right) {
+            colorGrid.setWriteGridPixel(x, y, palett.empty);
+            colorGrid.setWriteGridPixel(x + dir, y, palett.water);
+          } else if (left) {
+            colorGrid.setWriteGridPixel(x, y, palett.empty);
+            colorGrid.setWriteGridPixel(x - 1, y, palett.water);
+          } else if (right) {
+            colorGrid.setWriteGridPixel(x, y, palett.empty);
+            colorGrid.setWriteGridPixel(x + 1, y, palett.water);
+          }
+        }
+      }
     }
   }
 }
