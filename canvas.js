@@ -14,13 +14,13 @@ const mouse = {
     down: false,
     x: undefined,
     y: undefined,
-    size: 1,
+    size: 5,
     colorId: element.sand.id
 }
 const gameState = {
   pause: false
 }
-const gridDimension = 20;
+const gridDimension = 150;
 const imageData = ctx.createImageData(gridDimension, gridDimension);
 const colorGrid = new ColorGrid(gridDimension, gridDimension);
 paintCanvas(canvas);
@@ -29,6 +29,8 @@ canvas.addEventListener('mousedown', toggleMouseDown);
 canvas.addEventListener('mouseup', toggleMouseUp);
 canvas.addEventListener('mouseleave', toggleMouseUp);
 canvas.addEventListener('mousemove', setMouse);
+
+// Controls
 document.addEventListener('keypress', function(e) {
   switch (e.key) {
     case 's':
@@ -86,19 +88,29 @@ function updateGrid() {
     drawSquare();
   }
   const dir = Math.random() < 0.5 ? 1 : -1;
+  let leftFirst = true;
   for (let y = 0; y < gridDimension; y++) {
-  // for (let y = gridDimension - 1; y >= 0; y--) {
-    for (let x = 0; x < gridDimension; x++) {
-      switch (colorGrid.getReadGridPixel(x, y)) {
-        case 1:
-          handleSand(x, y, dir);
-          break;
-        case 2:
-          handleWater(x, y, dir);
-          break;
+    if (leftFirst) {
+      for (let x = 0; x < gridDimension; x++) {
+        handlePixel(x, y, dir);
       }
-      
+    } else {
+      for (let x = gridDimension - 1; x >= 0; x--) {
+        handlePixel(x, y, dir);
+      }
     }
+    leftFirst = !leftFirst;
+  }
+}
+
+function handlePixel(x, y, dir) {
+  switch (colorGrid.getReadGridPixel(x, y)) {
+    case 1:
+      handleSand(x, y, dir);
+      break;
+    case 2:
+      handleWater(x, y, dir);
+      break;
   }
 }
 
