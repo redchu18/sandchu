@@ -16,17 +16,21 @@ class ColorGrid {
   }
 
   // Get pixel from read grid
-  getReadGridPixel(x, y) {
+  getReadGridPixelId(x, y) {
     return this.readGrid[y][x];
+  }
+
+  // Check if cell is in bounds
+  isInBounds(x, y) {
+    return x >= 0 && x < this.width && y >= 0 && y < this.height;
   }
 
   // Check if cell is empty
   isEmpty(x, y) {
-    const isInBounds = x >= 0 && x < this.width && y >= 0 && y < this.height;
-    return isInBounds && this.getPixel(x, y) == element.empty.id;
+    return this.isInBounds(x, y) && this.getPixel(x, y) == element.emptyId;
   }
 
-  // Get the pixel at location xy
+  // Get the pixel at location xys
   getPixel(x, y) {
     return this.grid[y][x];
   }
@@ -40,7 +44,7 @@ class ColorGrid {
       const row = new Array(this.width);
 
       for (let j = 0; j < row.length; j++) {
-        row[j] = element.empty.id;
+        row[j] = element.emptyId;
       }
 
       this.grid[i] = row;
@@ -48,11 +52,11 @@ class ColorGrid {
   }
 
   // Set pixels to color a square using xy location, color and length
-  setSquare(x, y, length, colorId) {
+  setSquare(x, y, length, elementId) {
     const startingX = x;
     for (let i = 0; i < length; i++) {
       for (let j = 0; j < length; j++) {
-        this.setPixel(x, y, colorId);
+        this.setPixel(x, y, elementId);
         x++;
       }
       y++;
@@ -60,10 +64,17 @@ class ColorGrid {
     }
   }
 
+  // Swap pixel
+  swapPixel(x1, y1, x2, y2) {
+    const pixel = this.grid[y1][x1];
+    this.grid[y1][x1] = this.grid[y2][x2];
+    this.grid[y2][x2] = pixel;
+  }
+
   // Set a single pixel in the grid using xy location and color
-  setPixel(x, y, colorId) {
+  setPixel(x, y, elementId) {
     if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-      this.grid[y][x] = colorId;
+      this.grid[y][x] = elementId;
     }
   } 
 
@@ -72,22 +83,9 @@ class ColorGrid {
   getColorArray() {
     const colorArray = new Array();
     this.grid.forEach((row) => {
-      row.forEach((colorId) => {
-        switch (colorId) {
-          case 0:
-            colorArray.push(...element.empty.color);
-            break;
-          case 1:
-            colorArray.push(...element.sand.color);
-            break;
-          case 2:
-            colorArray.push(...element.water.color);
-            break;
-          case 3:
-            colorArray.push(...element.rock.color);
-            break;
-        }
-      })
+      row.forEach((elementId) => {
+        colorArray.push(...elementProps[elementId].color);
+      });
     });
     return Uint8ClampedArray.from(colorArray);
   }

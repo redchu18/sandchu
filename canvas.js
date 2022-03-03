@@ -9,13 +9,19 @@ canvas.width = canvasDimension;
 canvas.height = canvasDimension;
 ctx.imageSmoothingEnabled = false;
 
-// Global Variables
+// Variables
+const sandId = element.sandId;
+const waterId = element.waterId;
+const emptyId = element.emptyId;
+const rockId = element.rockId;
+const oilId = element.oilId;
+
 const mouse = {
     down: false,
     x: undefined,
     y: undefined,
     size: 5,
-    colorId: element.sand.id
+    colorId: sandId
 }
 const gameState = {
   pause: false
@@ -25,25 +31,30 @@ const imageData = ctx.createImageData(gridDimension, gridDimension);
 const colorGrid = new ColorGrid(gridDimension, gridDimension);
 paintCanvas(canvas);
 
-canvas.addEventListener('mousedown', toggleMouseDown);
-canvas.addEventListener('mouseup', toggleMouseUp);
-canvas.addEventListener('mouseleave', toggleMouseUp);
-canvas.addEventListener('mousemove', setMouse);
+
+// Event listeners
+canvas.addEventListener('mousedown', handleMouseDown);
+canvas.addEventListener('mouseup', handleMouseUp);
+canvas.addEventListener('mouseleave', handleMouseUp);
+canvas.addEventListener('mousemove', handleMouseMove);
 
 // Controls
 document.addEventListener('keypress', function(e) {
   switch (e.key) {
     case 's':
-      mouse.colorId = element.sand.id;
+      mouse.colorId = sandId;
       break;
     case 'w':
-      mouse.colorId = element.water.id;
+      mouse.colorId = waterId;
       break;
     case 'e':
-      mouse.colorId = element.empty.id;
+      mouse.colorId = emptyId;
       break;
     case 'r':
-      mouse.colorId = element.rock.id;
+      mouse.colorId = rockId;
+      break;
+    case 'o':
+      mouse.colorId = oilId;
       break;
     case 'p':
       if (gameState.pause) {
@@ -68,14 +79,13 @@ animate();
 function stepFrame() {
   colorGrid.readyReadGrid();
   updateGrid();
-  paintCanvas();
 }
 
 function animate() {
-  if (gameState.pause) {
-    return;
+  if (!gameState.pause) {
+    stepFrame(); 
   }
-  stepFrame();
+  paintCanvas();
   requestAnimationFrame(animate);
 }
 
@@ -104,69 +114,73 @@ function updateGrid() {
 }
 
 function handlePixel(x, y, dir) {
-  switch (colorGrid.getReadGridPixel(x, y)) {
+  const pixelId = colorGrid.getReadGridPixelId(x, y);
+  switch (pixelId) {
     case 1:
-      handleSand(x, y, dir);
+      handleSand(x, y, dir, pixelId);
       break;
     case 2:
-      handleWater(x, y, dir);
+    case 4:
+      handleLiquid(x, y, dir, pixelId);
       break;
   }
 }
 
-function handleSand(x, y, dir) {
-  const bottom = colorGrid.isEmpty(x, y + 1)
-  const botLeft = colorGrid.isEmpty(x - 1, y + 1);
-  const botRight = colorGrid.isEmpty(x + 1, y + 1);
+function handleSand(x, y, dir, pixelId) {
+  const bottom = shouldSwap(pixelId, x, y + 1)
+  const botLeft = shouldSwap(pixelId, x - 1, y + 1);
+  const botRight = shouldSwap(pixelId, x + 1, y + 1);
   if (bottom) {
-    colorGrid.setPixel(x, y, element.empty.id);
-    colorGrid.setPixel(x, y + 1, element.sand.id)
+    colorGrid.swapPixel(x, y, x, y + 1);
   } else {
     if (botLeft && botRight ) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x + dir, y + 1, element.sand.id);
+      colorGrid.swapPixel(x, y, x + dir, y + 1);
     } else if (botLeft) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x - 1, y + 1, element.sand.id);
+      colorGrid.swapPixel(x, y, x - 1 , y + 1);
     } else if (botRight) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x + 1, y + 1, element.sand.id);
+      colorGrid.swapPixel(x, y, x + 1, y + 1);
     }
   }
 }
 
-function handleWater(x, y, dir) {
-  const bottom = colorGrid.isEmpty(x, y + 1)
-  const botLeft = colorGrid.isEmpty(x - 1, y + 1);
-  const botRight = colorGrid.isEmpty(x + 1, y + 1);
-  const left = colorGrid.isEmpty(x - 1, y);
-  const right = colorGrid.isEmpty(x + 1, y);
+function handleLiquid(x, y, dir, pixelId) {
+  const bottom = shouldSwap(pixelId, x, y + 1)
+  const botLeft = shouldSwap(pixelId, x - 1, y + 1);
+  const botRight = shouldSwap(pixelId, x + 1, y + 1);
+  const left = shouldSwap(pixelId, x - 1, y);
+  const right = shouldSwap(pixelId, x + 1, y);
   if (bottom) {
-    colorGrid.setPixel(x, y, element.empty.id);
-    colorGrid.setPixel(x, y + 1, element.water.id)
+    colorGrid.swapPixel(x, y, x, y + 1);
   } else if (botLeft || botRight) {
     if (botLeft && botRight ) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x + dir, y + 1, element.water.id);
+      colorGrid.swapPixel(x, y, x + dir, y + 1);
     } else if (botLeft) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x - 1, y + 1, element.water.id);
+      colorGrid.swapPixel(x, y, x - 1, y + 1);
     } else if (botRight) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x + 1, y + 1, element.water.id);
+      colorGrid.swapPixel(x, y, x + 1, y + 1);
     }
   } else {
     if (left && right) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x + dir, y, element.water.id);
+      colorGrid.swapPixel(x, y, x + dir, y);
     } else if (left) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x - 1, y, element.water.id);
+      colorGrid.swapPixel(x, y, x - 1, y);
     } else if (right) {
-      colorGrid.setPixel(x, y, element.empty.id);
-      colorGrid.setPixel(x + 1, y, element.water.id);
+      colorGrid.swapPixel(x, y, x + 1, y);
     }
   }
+}
+
+function shouldSwap(pixelId, x, y) {
+  if (colorGrid.isEmpty(x, y)) {
+    return true;
+  } else if (colorGrid.isInBounds(x, y)) {
+    const locationPixelId = colorGrid.getReadGridPixelId(x, y);
+    const density =  elementProps[pixelId].density;
+    const locationDensity =  elementProps[locationPixelId].density;
+
+    return density > locationDensity;
+  }
+  return false;
 }
 
 function drawSquare(e) {
@@ -179,14 +193,22 @@ function setMouse(e) {
     mouse.y = Math.floor((e.offsetY / canvasDimension) * gridDimension);
 }
 
-function toggleMouseDown(e) {
-  if (e.buttons == 1) {
-    mouse.down = true;
-    setMouse(e);
+function handleMouseMove(e) {
+  setMouse(e);
+  if (gameState.pause && mouse.down) {
+    drawSquare();
   }
 }
 
-function toggleMouseUp(e) {
+function handleMouseDown(e) {
+  if (e.buttons == 1) {
+    mouse.down = true;
+    setMouse(e);
+    drawSquare();
+  }
+}
+
+function handleMouseUp(e) {
   mouse.down = false;
 }
 
