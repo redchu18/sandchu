@@ -4,9 +4,10 @@
 // Initialize canvas
 const canvas = document.getElementById('powder_canvas');
 const ctx = canvas.getContext('2d');
-const canvasDimension = 600;
-canvas.width = canvasDimension;
-canvas.height = canvasDimension;
+const canvasWidth = 600;
+const canvasHeight = 800;
+canvas.width = canvasWidth;
+canvas.height = canvasHeight;
 ctx.imageSmoothingEnabled = false;
 
 // Variables
@@ -21,15 +22,16 @@ const mouse = {
     down: false,
     x: undefined,
     y: undefined,
-    size: 5,
+    size: 10,
     colorId: sandId
 }
 const gameState = {
   pause: false
 }
-const gridDimension = 300;
-const imageData = ctx.createImageData(gridDimension, gridDimension);
-const colorGrid = new ColorGrid(gridDimension, gridDimension);
+const gridWidth = 150;
+const gridHeight = 200;
+const imageData = ctx.createImageData(gridWidth, gridHeight);
+const colorGrid = new ColorGrid(gridWidth, gridHeight);
 paintCanvas(canvas);
 
 
@@ -103,13 +105,13 @@ function updateGrid() {
   }
   const dir = Math.random() < 0.5 ? 1 : -1;
   let leftFirst = true;
-  for (let y = 0; y < gridDimension; y++) {
+  for (let y = 0; y < gridHeight; y++) {
     if (leftFirst) {
-      for (let x = 0; x < gridDimension; x++) {
+      for (let x = 0; x < gridWidth; x++) {
         handlePixel(x, y, dir);
       }
     } else {
-      for (let x = gridDimension - 1; x >= 0; x--) {
+      for (let x = gridWidth - 1; x >= 0; x--) {
         handlePixel(x, y, dir);
       }
     }
@@ -267,8 +269,8 @@ function drawSquare(e) {
 }
 
 function setMouse(e) {
-    mouse.x = Math.floor((e.offsetX / canvasDimension) * gridDimension);
-    mouse.y = Math.floor((e.offsetY / canvasDimension) * gridDimension);
+    mouse.x = Math.floor((e.offsetX / canvasWidth) * gridWidth);
+    mouse.y = Math.floor((e.offsetY / canvasHeight) * gridHeight);
 }
 
 function handleMouseMove(e) {
@@ -293,6 +295,6 @@ function handleMouseUp(e) {
 function paintCanvas() {
   imageData.data.set(colorGrid.getColorArray());
   createImageBitmap(imageData).then((imageBitMap) => {
-    ctx.drawImage(imageBitMap, 0, 0, canvasDimension, canvasDimension);
+    ctx.drawImage(imageBitMap, 0, 0, canvasWidth, canvasHeight);
   });
 }

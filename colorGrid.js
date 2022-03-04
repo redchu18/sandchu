@@ -3,7 +3,7 @@ class ColorGrid {
   readGrid = new Array();
   grid = new Array(); 
 
-  constructor(height, width) {
+  constructor(width, height) {
     this.height = height;
     this.width = width;
     this.resetGrid();
