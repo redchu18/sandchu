@@ -30,6 +30,11 @@ class ColorGrid {
     return this.isInBounds(x, y) && this.getPixel(x, y) == element.emptyId;
   }
 
+  // Returns whether or not a pixel has a certain id
+  isPixel(x, y, pixelId) {
+    return this.isInBounds(x, y) && this.getReadGridPixelId(x, y) == pixelId;
+  }
+
   // Get the pixel at location xys
   getPixel(x, y) {
     return this.grid[y][x];
@@ -56,7 +61,9 @@ class ColorGrid {
     const startingX = x;
     for (let i = 0; i < length; i++) {
       for (let j = 0; j < length; j++) {
-        this.setPixel(x, y, elementId);
+        if (this.isEmpty(x, y) || elementId == element.emptyId) {
+          this.setPixel(x, y, elementId);
+        }
         x++;
       }
       y++;

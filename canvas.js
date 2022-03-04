@@ -10,6 +10,7 @@ canvas.height = canvasDimension;
 ctx.imageSmoothingEnabled = false;
 
 // Variables
+const fireId = element.fireId;
 const sandId = element.sandId;
 const waterId = element.waterId;
 const emptyId = element.emptyId;
@@ -26,7 +27,7 @@ const mouse = {
 const gameState = {
   pause: false
 }
-const gridDimension = 150;
+const gridDimension = 300;
 const imageData = ctx.createImageData(gridDimension, gridDimension);
 const colorGrid = new ColorGrid(gridDimension, gridDimension);
 paintCanvas(canvas);
@@ -41,6 +42,9 @@ canvas.addEventListener('mousemove', handleMouseMove);
 // Controls
 document.addEventListener('keypress', function(e) {
   switch (e.key) {
+    case 'f':
+      mouse.colorId = fireId;
+      break;
     case 's':
       mouse.colorId = sandId;
       break;
@@ -123,6 +127,42 @@ function handlePixel(x, y, dir) {
     case 4:
       handleLiquid(x, y, dir, pixelId);
       break;
+    case 5:
+      handleFire(x, y, dir, pixelId);
+  }
+}
+
+function handleFire(x, y, dir, fireId) {
+  if (fireShouldDissapear()) {
+    colorGrid.setPixel(x, y, emptyId);
+    return;
+  } else if (!fireShouldRise()) {
+    return;
+  }
+
+  const top = shouldSwapFire(x, y - 1);
+  const topLeft = shouldSwapFire(x - 1, y - 1);
+  const topRight = shouldSwapFire(x +  1, y - 1);
+  const left = shouldSwapFire(x - 1, y);
+  const right = shouldSwapFire(x + 1, y);
+  if (top) {
+    colorGrid.swapPixel(x, y, x, y - 1);
+  } else if (topLeft || topRight) {
+    if (topLeft && topRight) {
+      colorGrid.swapPixel(x, y, x + dir, y - 1);
+    } else if (topLeft) {
+      colorGrid.swapPixel(x, y, x - 1, y - 1);
+    } else if (topRight) {
+      colorGrid.swapPixel(x, y, x + 1, y - 1);
+    }
+  } else {
+    if (left && right) {
+      colorGrid.swapPixel(x, y, x + dir, y);
+    } else if (left) {
+      colorGrid.swapPixel(x, y, x - 1, y);
+    } else if (right) {
+      colorGrid.swapPixel(x, y, x + 1, y);
+    }
   }
 }
 
@@ -144,6 +184,11 @@ function handleSand(x, y, dir, pixelId) {
 }
 
 function handleLiquid(x, y, dir, pixelId) {
+  if (shouldCatchFire(x, y, pixelId)) {
+    colorGrid.setPixel(x, y, fireId);
+    return;
+  }
+
   const bottom = shouldSwap(pixelId, x, y + 1)
   const botLeft = shouldSwap(pixelId, x - 1, y + 1);
   const botRight = shouldSwap(pixelId, x + 1, y + 1);
@@ -168,6 +213,39 @@ function handleLiquid(x, y, dir, pixelId) {
       colorGrid.swapPixel(x, y, x + 1, y);
     }
   }
+}
+
+// Fire Interaction
+function shouldCatchFire(x, y, pixelId) {
+  let shouldCatch = Math.random() < elementProps[pixelId].flammability;
+  if (shouldCatch) {
+    if (
+      colorGrid.isPixel(x + 1, y, fireId) ||
+      colorGrid.isPixel(x - 1, y, fireId) ||
+      colorGrid.isPixel(x, y - 1, fireId) ||
+      colorGrid.isPixel(x, y + 1, fireId) ||
+      colorGrid.isPixel(x + 1, y - 1, fireId) ||
+      colorGrid.isPixel(x - 1, y - 1) ||
+      colorGrid.isPixel(x + 1, y + 1) ||
+      colorGrid.isPixel(x + 1, y + 1)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Fire movement
+function shouldSwapFire(x, y) {
+  return colorGrid.isEmpty(x, y);
+}
+
+function fireShouldRise() {
+  return Math.random() < elementProps[fireId].riseRate;
+}
+
+function fireShouldDissapear() {
+  return Math.random() < elementProps[fireId].burnRate;
 }
 
 function shouldSwap(pixelId, x, y) {
