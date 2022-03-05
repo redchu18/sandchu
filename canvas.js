@@ -41,7 +41,22 @@ canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseleave', handleMouseUp);
 canvas.addEventListener('mousemove', handleMouseMove);
 
+for (let i = 0; i < childrenUiButtons.length; i++) {
+  const uiElement = childrenUiButtons[i];
+  if (uiElement.tagName == 'BUTTON') {
+    uiElement.addEventListener('click', function(e) {
+      selectElement(this.id);
+    })
+  }
+}
+
+mouseSlider.addEventListener('mouseup', function(e) {
+  mouse.size = parseInt(this.value);
+});
+
 // Controls
+selectElement(1); // Select default element
+
 document.addEventListener('keypress', function(e) {
   switch (e.key) {
     case 'f':
@@ -266,6 +281,12 @@ function shouldSwap(pixelId, x, y) {
 function drawSquare(e) {
     const penOffset = Math.floor(mouse.size / 2);
     colorGrid.setSquare(mouse.x - penOffset, mouse.y - penOffset, mouse.size, mouse.colorId);
+}
+
+function selectElement(id) {
+  resetButtonsToDefault();
+  highlightButton(id);
+  mouse.colorId = parseInt(id);
 }
 
 function setMouse(e) {
