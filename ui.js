@@ -3,6 +3,9 @@
 const uiElementsDiv = document.getElementById('ui_elements');
 
 for (let i = elementCount - 1; i >= 0; i--) {
+  if (elementProps[i].hidden) {
+    continue;
+  }
     const button = document.createElement("button");
     switch(i) {
         case 2:
@@ -10,6 +13,7 @@ for (let i = elementCount - 1; i >= 0; i--) {
             button.style.color = 'white';
             break;
         case 4:
+        case 6:
             button.style.color = 'lightgray';
             break;
         default:

@@ -17,19 +17,28 @@ const waterId = element.waterId;
 const emptyId = element.emptyId;
 const rockId = element.rockId;
 const oilId = element.oilId;
+const dirtId = element.dirtId;
+const seedId = element.seedId;
+const growingFlowerId = element.growingFlowerId;
+const flowerStemId = element.flowerStemId;
+const redPetalId = element.redPetalId;
+const yellowPetalId = element.yellowPetalId;
+const bluePetalId = element.bluePetalId;
+const pinkPetalId = element.pinkPetalId;
+const purplePetalId = element.purplePetalId;
 
 const mouse = {
     down: false,
     x: undefined,
     y: undefined,
-    size: 10,
+    size: 15,
     colorId: sandId
 }
 const gameState = {
   pause: false
 }
-const gridWidth = 150;
-const gridHeight = 200;
+const gridWidth = 9;
+const gridHeight = 12;
 const imageData = ctx.createImageData(gridWidth, gridHeight);
 const colorGrid = new ColorGrid(gridWidth, gridHeight);
 paintCanvas(canvas);
@@ -59,24 +68,6 @@ selectElement(1); // Select default element
 
 document.addEventListener('keypress', function(e) {
   switch (e.key) {
-    case 'f':
-      mouse.colorId = fireId;
-      break;
-    case 's':
-      mouse.colorId = sandId;
-      break;
-    case 'w':
-      mouse.colorId = waterId;
-      break;
-    case 'e':
-      mouse.colorId = emptyId;
-      break;
-    case 'r':
-      mouse.colorId = rockId;
-      break;
-    case 'o':
-      mouse.colorId = oilId;
-      break;
     case 'p':
       if (gameState.pause) {
         gameState.pause = false;
@@ -118,15 +109,16 @@ function updateGrid() {
   if (mouse.down) {
     drawSquare();
   }
-  const dir = Math.random() < 0.5 ? 1 : -1;
   let leftFirst = true;
   for (let y = 0; y < gridHeight; y++) {
     if (leftFirst) {
       for (let x = 0; x < gridWidth; x++) {
+        const dir = Math.random() < 0.5 ? 1 : -1;
         handlePixel(x, y, dir);
       }
     } else {
       for (let x = gridWidth - 1; x >= 0; x--) {
+        const dir = Math.random() < 0.5 ? 1 : -1;
         handlePixel(x, y, dir);
       }
     }
@@ -137,16 +129,78 @@ function updateGrid() {
 function handlePixel(x, y, dir) {
   const pixelId = colorGrid.getReadGridPixelId(x, y);
   switch (pixelId) {
-    case 1:
-      handleSand(x, y, dir, pixelId);
+    case sandId:
+    case dirtId:
+    case seedId:
+      handleSolid(x, y, dir, pixelId);
       break;
-    case 2:
-    case 4:
+    case waterId:
+    case oilId:
       handleLiquid(x, y, dir, pixelId);
       break;
-    case 5:
+    case fireId:
       handleFire(x, y, dir, pixelId);
+      break;
+    case growingFlowerId:
+      handleGrowingFlower(x, y, dir, pixelId);
+      break;
   }
+}
+
+function handleGrowingFlower(x, y, dir, pixelId) {
+  if (Math.random() < elementProps[pixelId].bloomChance) {
+    bloomFLower(x, y, pixelId);
+    return;
+  }
+
+  const top = colorGrid.isEmpty(x, y - 1);
+  const topLeft = colorGrid.isEmpty(x - 1, y - 1);
+  const topRight = colorGrid.isEmpty(x + 1, y - 1);
+
+  const shouldGrowUp = Math.random() < elementProps[pixelId].topBias;
+  
+  if (shouldGrowUp && top) {
+    colorGrid.setPixel(x, y - 1, growingFlowerId);
+    colorGrid.setPixel(x, y, flowerStemId);
+  } else if (topLeft || topRight) {
+    if (topLeft && topRight) {
+      colorGrid.setPixel(x + dir, y - 1, growingFlowerId);
+      colorGrid.setPixel(x, y, flowerStemId);
+    } else if (topLeft) {
+      colorGrid.setPixel(x - 1, y - 1, growingFlowerId);
+      colorGrid.setPixel(x, y, flowerStemId);
+    } else if (topRight) {
+      colorGrid.setPixel(x + 1, y - 1, growingFlowerId);
+      colorGrid.setPixel(x, y, flowerStemId);
+    }
+  }
+}
+
+function bloomFLower(x, y, pixelId) {
+  colorGrid.setPixel(x, y, flowerStemId);
+  const flowerPetalId = pickRandomFlowerPetalId();
+  for (let i = -3; i <= 3; i++) {
+    for (let j = -1; j >= -4; j--) {
+      if (Math.random() < elementProps[pixelId].hollowChance) {
+        continue;
+      }
+
+      if (colorGrid.isEmpty(x + i, y + j)) {
+        if (
+          (j != -4 || i != -3) && 
+          (j != -4 || i != 3) &&
+          (j != -1 || i != -3) &&
+          (j != -1 || i != 3)
+        ) {
+          colorGrid.setPixel(x + i, y + j, flowerPetalId);
+        }
+      }
+    }
+  }
+}
+
+function pickRandomFlowerPetalId() {
+  return 10 + Math.floor((Math.random() * 5));
 }
 
 function handleFire(x, y, dir, fireId) {
@@ -183,7 +237,22 @@ function handleFire(x, y, dir, fireId) {
   }
 }
 
-function handleSand(x, y, dir, pixelId) {
+function handleSolid(x, y, dir, pixelId) {
+  if (shouldCatchFire(x, y, pixelId)) {
+    colorGrid.setPixel(x, y, fireId);
+    return;
+  }
+
+  if (shouldStartGrowing(x, y, pixelId)) {
+    colorGrid.setPixel(x, y, growingFlowerId);
+    return;
+  }
+
+  if (shouldDissapear(x, y, pixelId)) {
+    colorGrid.setPixel(x, y, emptyId);
+    return;
+  }
+
   const bottom = shouldSwap(pixelId, x, y + 1)
   const botLeft = shouldSwap(pixelId, x - 1, y + 1);
   const botRight = shouldSwap(pixelId, x + 1, y + 1);
@@ -197,6 +266,12 @@ function handleSand(x, y, dir, pixelId) {
     } else if (botRight) {
       colorGrid.swapPixel(x, y, x + 1, y + 1);
     }
+  }
+}
+
+function shouldDissapear(x, y, pixelId) {
+  if (pixelId == seedId) {
+    return (hasAdjacentPixel(x, y, growingFlowerId) || hasAdjacentPixel(x, y, flowerStemId));
   }
 }
 
@@ -232,22 +307,23 @@ function handleLiquid(x, y, dir, pixelId) {
   }
 }
 
+// Seed Interaction
+function shouldStartGrowing(x, y) {
+  if (
+    colorGrid.isPixel(x, y, seedId) && 
+    colorGrid.isPixel(x, y + 1, dirtId) ||
+    colorGrid.isPixel(x, y + 1, growingFlowerId)
+  ) {
+    return true;
+  }
+  return false;
+}
+
 // Fire Interaction
 function shouldCatchFire(x, y, pixelId) {
   let shouldCatch = Math.random() < elementProps[pixelId].flammability;
   if (shouldCatch) {
-    if (
-      colorGrid.isPixel(x + 1, y, fireId) ||
-      colorGrid.isPixel(x - 1, y, fireId) ||
-      colorGrid.isPixel(x, y - 1, fireId) ||
-      colorGrid.isPixel(x, y + 1, fireId) ||
-      colorGrid.isPixel(x + 1, y - 1, fireId) ||
-      colorGrid.isPixel(x - 1, y - 1) ||
-      colorGrid.isPixel(x + 1, y + 1) ||
-      colorGrid.isPixel(x + 1, y + 1)
-    ) {
-      return true;
-    }
+    return hasAdjacentPixel(x, y, fireId);
   }
   return false;
 }
@@ -263,6 +339,22 @@ function fireShouldRise() {
 
 function fireShouldDissapear() {
   return Math.random() < elementProps[fireId].burnRate;
+}
+
+function hasAdjacentPixel(x, y, pixelId) {
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if (i != 0 || j != 0) {
+        const debuggingId = colorGrid.getPixel(x + i, y + j);
+        const ii = x + i;
+        const jj = y + j;
+        if (colorGrid.isInBounds(x + i, y + j) && colorGrid.getPixel(x + i, y + j) == pixelId) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 function shouldSwap(pixelId, x, y) {
