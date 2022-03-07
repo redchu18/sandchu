@@ -37,8 +37,8 @@ const mouse = {
 const gameState = {
   pause: false
 }
-const gridWidth = 9;
-const gridHeight = 12;
+const gridWidth = 300;
+const gridHeight = 400;
 const imageData = ctx.createImageData(gridWidth, gridHeight);
 const colorGrid = new ColorGrid(gridWidth, gridHeight);
 paintCanvas(canvas);
@@ -148,6 +148,10 @@ function handlePixel(x, y, dir) {
 }
 
 function handleGrowingFlower(x, y, dir, pixelId) {
+  if (Math.random() < elementProps[pixelId].stopGrowingChance) {
+    return;
+  }
+
   if (Math.random() < elementProps[pixelId].bloomChance) {
     bloomFLower(x, y, pixelId);
     return;
@@ -185,7 +189,7 @@ function bloomFLower(x, y, pixelId) {
         continue;
       }
 
-      if (colorGrid.isEmpty(x + i, y + j)) {
+      if (colorGrid.isEmpty(x + i, y + j) || colorGrid.isPixel(x + i, y + j, flowerStemId)) {
         if (
           (j != -4 || i != -3) && 
           (j != -4 || i != 3) &&
@@ -345,9 +349,6 @@ function hasAdjacentPixel(x, y, pixelId) {
   for (let i = -1; i <= 1; i++) {
     for (let j = -1; j <= 1; j++) {
       if (i != 0 || j != 0) {
-        const debuggingId = colorGrid.getPixel(x + i, y + j);
-        const ii = x + i;
-        const jj = y + j;
         if (colorGrid.isInBounds(x + i, y + j) && colorGrid.getPixel(x + i, y + j) == pixelId) {
           return true;
         }

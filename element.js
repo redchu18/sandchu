@@ -70,7 +70,8 @@ const elementProps = {
     flammability: .05,
     topBias: .4,
     bloomChance: .1,
-    hollowChance: .2
+    hollowChance: .2,
+    stopGrowingChance: .95
   },
   7: {
     name: 'Seed',
