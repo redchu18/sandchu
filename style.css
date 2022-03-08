@@ -12,8 +12,8 @@ body {
 }
 #powder_canvas {
     border: 2px solid gray;
-    width: 600px;
-    height: 800px;
+    width: 1100px;
+    height: 750px;
 }
 #title{
     font-size: 35px;

@@ -4,13 +4,16 @@
 // Initialize canvas
 const canvas = document.getElementById('powder_canvas');
 const ctx = canvas.getContext('2d');
-const canvasWidth = 600;
-const canvasHeight = 800;
+const canvasWidth = 1100;
+const canvasHeight = 750;
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 ctx.imageSmoothingEnabled = false;
 
 // Variables
+const ashId = element.ashId;
+const ablazeCharcoalId = element.ablazeCharcoalId;
+const ablazePlantId = element.ablazePlantId;
 const fireId = element.fireId;
 const sandId = element.sandId;
 const waterId = element.waterId;
@@ -37,8 +40,8 @@ const mouse = {
 const gameState = {
   pause: false
 }
-const gridWidth = 300;
-const gridHeight = 400;
+const gridWidth = 400;
+const gridHeight = 300;
 const imageData = ctx.createImageData(gridWidth, gridHeight);
 const colorGrid = new ColorGrid(gridWidth, gridHeight);
 paintCanvas(canvas);
@@ -132,6 +135,7 @@ function handlePixel(x, y, dir) {
     case sandId:
     case dirtId:
     case seedId:
+    case ashId:
       handleSolid(x, y, dir, pixelId);
       break;
     case waterId:
@@ -144,6 +148,52 @@ function handlePixel(x, y, dir) {
     case growingFlowerId:
       handleGrowingFlower(x, y, dir, pixelId);
       break;
+    case flowerStemId:
+    case redPetalId:
+    case yellowPetalId:
+    case bluePetalId:
+    case pinkPetalId:
+    case purplePetalId:
+      handlePlantMatter(x, y, pixelId);
+      break;
+    case ablazeCharcoalId:
+    case ablazePlantId:
+      handleAblazeElements(x, y, pixelId);
+  }
+}
+
+function handleAblazeElements(x, y, pixelId) {
+
+  if (hasAdjacentPixel(x, y, waterId)) {
+    colorGrid.setPixel(x, y, ashId);
+  }
+
+  if (pixelId == ablazePlantId) {
+    const shouldTransform = Math.random() < elementProps[pixelId].charcoalChance;
+    if (shouldTransform) {
+      colorGrid.setPixel(x, y, ablazeCharcoalId);
+    }
+  } else if (pixelId == ablazeCharcoalId) {
+    const shouldTransform = Math.random() < elementProps[pixelId].ashChance;
+    if (shouldTransform) {
+      colorGrid.setPixel(x, y, ashId);
+    }
+  }
+  produceFire(x, y);
+}
+
+function handlePlantMatter(x, y, pixelId) {
+  if (shouldPlantCatchFire(x, y, pixelId)) {
+    colorGrid.setPixel(x, y, ablazePlantId);
+  }
+}
+
+function shouldPlantCatchFire(x, y, pixelId) {
+  if (shouldCatchFire(x, y, pixelId)) {
+    return true;
+  }
+  if (hasAdjacentPixel(x, y, ablazePlantId) && Math.random() < elementProps[ablazePlantId].spreadChance) {
+    return true;
   }
 }
 
@@ -180,13 +230,21 @@ function handleGrowingFlower(x, y, dir, pixelId) {
   }
 }
 
+// fix spaghetti code here
 function bloomFLower(x, y, pixelId) {
   colorGrid.setPixel(x, y, flowerStemId);
   const flowerPetalId = pickRandomFlowerPetalId();
+  const shouldGrowOverStem = Math.random() < elementProps[pixelId].growOverStemChance;
   for (let i = -3; i <= 3; i++) {
     for (let j = -1; j >= -4; j--) {
       if (Math.random() < elementProps[pixelId].hollowChance) {
         continue;
+      }
+
+      if (!shouldGrowOverStem) {
+        if (colorGrid.isPixel(x + i, y + j, flowerStemId)) {
+          continue;
+        }
       }
 
       if (colorGrid.isEmpty(x + i, y + j) || colorGrid.isPixel(x + i, y + j, flowerStemId)) {
@@ -282,6 +340,7 @@ function shouldDissapear(x, y, pixelId) {
 function handleLiquid(x, y, dir, pixelId) {
   if (shouldCatchFire(x, y, pixelId)) {
     colorGrid.setPixel(x, y, fireId);
+    produceFire(x, y);
     return;
   }
 
@@ -324,6 +383,18 @@ function shouldStartGrowing(x, y) {
 }
 
 // Fire Interaction
+function produceFire(x, y) {
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if (i != 0 || j != 0) {
+        if (colorGrid.isEmpty(x + i, y + j)) {
+          colorGrid.setPixel(x + i, y + j, fireId);
+        }
+      }
+    }
+  }
+}
+
 function shouldCatchFire(x, y, pixelId) {
   let shouldCatch = Math.random() < elementProps[pixelId].flammability;
   if (shouldCatch) {

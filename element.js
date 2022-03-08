@@ -1,6 +1,9 @@
-const elementCount = 11;
+const elementCount = 18;
 
 const element = {
+  ashId: 17,
+  ablazeCharcoalId: 16,
+  ablazePlantId: 15,
   purplePetalId: 14,
   pinkPetalId: 13,
   bluePetalId: 12,
@@ -19,47 +22,85 @@ const element = {
 }
 
 const elementProps = {
+  17: {
+    name: 'Ash',
+    color: [160, 155, 155, 255],
+    density: 1,
+    rigid: false,
+    hidden: true
+  },
+  16: {
+    name: 'Ablaze Charcoal',
+    color: [50, 50, 50, 255],
+    density: 1,
+    rigid: true,
+    hidden: true,
+    class: 'plant',
+    ashChance: .005
+  },
+  15: {
+    name: 'Ablaze Plant',
+    color: [140, 50, 1, 255],
+    density: 1,
+    rigid: true,
+    hidden: true,
+    class: 'plant',
+    charcoalChance: .005,
+    spreadChance: .01
+  },
   14: {
     name: 'Purple Petal',
     color: [85, 10, 100, 255],
     density: 1,
     rigid: true,
-    hidden: true
+    hidden: true,
+    class: 'plant',
+    flammability: .5
   },
   13: {
     name: 'Pink Petal',
     color: [250, 180, 195, 255],
     density: 1,
     rigid: true,
-    hidden: true
+    hidden: true,
+    class: 'plant',
+    flammability: .5
   },
   12: {
     name: 'Blue Petal',
     color: [75, 105, 180, 255],
     density: 1,
     rigid: true,
-    hidden: true
+    hidden: true,
+    class: 'plant',
+    flammability: .5
   },
   11: {
     name: 'Yellow Petal',
     color: [230, 195, 20, 255],
     density: 1,
     rigid: true,
-    hidden: true
+    hidden: true,
+    class: 'plant',
+    flammability: .5
   },
   10: {
     name: 'Red Petal',
     color: [150, 5, 20, 255],
     density: 1,
     rigid: true,
-    hidden: true
+    hidden: true,
+    class: 'plant',
+    flammability: .5
   },
   9: {
     name: 'Flower Stem',
     color: [30, 70, 20, 255],
     rigid: false,
     density: 1,
-    hidden: false
+    hidden: true,
+    class: 'plant',
+    flammability: .5,
   },
   8: {
     name: 'Growing Flower',
@@ -71,7 +112,9 @@ const elementProps = {
     topBias: .4,
     bloomChance: .1,
     hollowChance: .2,
-    stopGrowingChance: .95
+    stopGrowingChance: .95,
+    growOverStemChance: .1,
+    class: 'plant'
   },
   7: {
     name: 'Seed',
