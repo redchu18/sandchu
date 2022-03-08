@@ -44,6 +44,7 @@ const gridWidth = 400;
 const gridHeight = 300;
 const imageData = ctx.createImageData(gridWidth, gridHeight);
 const colorGrid = new ColorGrid(gridWidth, gridHeight);
+colorGrid.loadSavedGrid();
 paintCanvas(canvas);
 
 
@@ -86,6 +87,27 @@ document.addEventListener('keypress', function(e) {
       break;
   }
 });
+
+document.getElementById("playpause").addEventListener('click', () => {
+  if (playpause.checked) {
+    gameState.pause = true;
+  } else {
+    gameState.pause = false;
+    animate();
+  }
+});
+
+document.getElementById("save_button").addEventListener('click', () => {
+  savedArray = colorGrid.getGrid().map((row) => row.slice());
+});
+
+document.getElementById("load_button").addEventListener('click', () => {
+  colorGrid.loadSavedGrid();
+});
+
+document.getElementById("clear_button").addEventListener('click', () => {
+  colorGrid.resetGrid();
+})
 
 // begin animation
 animate();
@@ -384,14 +406,15 @@ function shouldStartGrowing(x, y) {
 
 // Fire Interaction
 function produceFire(x, y) {
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
-      if (i != 0 || j != 0) {
-        if (colorGrid.isEmpty(x + i, y + j)) {
-          colorGrid.setPixel(x + i, y + j, fireId);
-        }
-      }
-    }
+  // setFireIfNotEmpty(x, y - 1);
+  setFireIfNotEmpty(x, y + 1);
+  setFireIfNotEmpty(x - 1, y);
+  setFireIfNotEmpty(x + 1, y);
+}
+
+function setFireIfNotEmpty(x, y) {
+  if (colorGrid.isEmpty(x, y)) {
+    colorGrid.setPixel(x, y, fireId);
   }
 }
 

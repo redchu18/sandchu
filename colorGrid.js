@@ -10,6 +10,16 @@ class ColorGrid {
     this.readyReadGrid();
   }
 
+  getGrid() {
+    return this.grid;
+  }
+
+  // Load saved grid
+  loadSavedGrid() {
+    this.grid = savedArray.map((row) => row.slice());
+    this.readyReadGrid();
+  }
+
   // Ready read only grid
   readyReadGrid() {
     this.readGrid = this.grid.map((row) => row.slice());

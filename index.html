@@ -10,10 +10,21 @@
 <body id="parent">
     <div id="ui_elements">
         <div id="title">Falling Sand Game</div>
+        <!-- Below class from https://css-tricks.com/making-pure-css-playpause-button/ -->
         <div class="slider_label">Pen Size</div>
         <input id="mouse_slider" type="range" min="1" max="30" value="15" class="slider" id="myRange">
+        <div class="playpause">
+          <input type="checkbox" value="None" id="playpause" name="check" />
+          <label for="playpause" tabindex=1></label>
+        </div>
+        <div class="load_save_container">
+          <button type="button" id="load_button" class="load_save">Load</button>
+          <button type="button" id="save_button" class="load_save">Save</button>
+          <button type="button" id="clear_button" class="load_save">Clear</button>
+        </div>
     </div>
     <canvas id="powder_canvas"> </canvas>
+    <script src="save.js"></script>
     <script src="element.js"></script>
     <script src="ui.js"></script>
     <script src="colorGrid.js"></script>

@@ -14,6 +14,7 @@ for (let i = elementCount - 1; i >= 0; i--) {
             break;
         case 4:
         case 6:
+        case 7:
             button.style.color = 'lightgray';
             break;
         default:
