@@ -4,8 +4,10 @@
 // Initialize canvas
 const canvas = document.getElementById('powder_canvas');
 const ctx = canvas.getContext('2d');
-const canvasWidth = 1100;
-const canvasHeight = 750;
+const widthProp = .78;
+const heightProp = .53;
+let canvasWidth = Math.floor(window.innerWidth * widthProp);
+let canvasHeight = Math.floor(window.innerWidth * heightProp);
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 ctx.imageSmoothingEnabled = false;

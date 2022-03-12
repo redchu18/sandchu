@@ -3,7 +3,7 @@ body {
 }
 #parent { 
     display: grid; 
-    grid-template-columns: 20% 85%; 
+    grid-template-columns: 20% 80%; 
 }
 #ui_elements {
     display: flex;
@@ -12,8 +12,6 @@ body {
 }
 #powder_canvas {
     border: 2px solid gray;
-    width: 1100px;
-    height: 750px;
 }
 #title{
     font-size: 35px;
@@ -42,14 +40,14 @@ body {
   padding-left: 10px;
   padding-right: 10px;
   margin: 2px;
-  margin-left: 2px;
+  margin-left: 0px;
   margin-right: 2px;
   font-size: 17px;
   transition: backgroud-image .2s;
 }
 .load_save_container {
-  width: 80%;
-  padding-left: 10px;
+  width: 85%;
+  padding-left: 2px;
 }
 .slider {
     -webkit-appearance: none;
@@ -86,6 +84,10 @@ body {
 }
 
 /* Below button from https://css-tricks.com/making-pure-css-playpause-button/ */
+.playpause {
+  width: 10%;
+  padding-bottom: 2px;
+}
 .playpause label {
   display: block;
   box-sizing: border-box;
