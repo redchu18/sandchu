@@ -31,7 +31,6 @@ const yellowPetalId = element.yellowPetalId;
 const bluePetalId = element.bluePetalId;
 const pinkPetalId = element.pinkPetalId;
 const purplePetalId = element.purplePetalId;
-const charcoalId = element.charcoalId;
 
 const mouse = {
     down: false,
