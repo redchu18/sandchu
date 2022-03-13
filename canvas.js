@@ -100,7 +100,7 @@ document.getElementById("playpause").addEventListener('click', () => {
 });
 
 document.getElementById("save_button").addEventListener('click', () => {
-  savedArray = colorGrid.getGrid().map((row) => row.slice());
+  colorGrid.saveState();
 });
 
 document.getElementById("load_button").addEventListener('click', () => {
