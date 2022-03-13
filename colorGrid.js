@@ -11,7 +11,7 @@ class ColorGrid {
   }
 
   calculateIndexPosition(x, y) {
-    return ((y - 1) * this.width) + x - 1;
+    return y * this.width + x;
   }
 
   // Set a single pixel in the grid using xy location and color
@@ -29,16 +29,6 @@ class ColorGrid {
   // Get pixel from read grid
   getReadGridPixelId(x, y) {
     return this.readGrid[this.calculateIndexPosition(x, y)];
-  }
-
-  getGrid() {
-    return this.grid;
-  }
-
-  // Load saved grid
-  loadSavedGrid() {
-    this.grid = [...savedArray];
-    this.readyReadGrid();
   }
 
   // Ready read only grid
@@ -63,6 +53,7 @@ class ColorGrid {
 
   // Initializes "grid" field into a 2D array. The elements of the 2D array is an array of length 4, representing RGBA colors
   resetGrid() {
+    this.grid = [];
     for (let i = 0; i < this.width; i++) {
       for (let j = 0; j < this.height; j++) {
         this.grid.push(element.emptyId);
@@ -90,6 +81,17 @@ class ColorGrid {
     const pixel = this.getPixel(x1, y1);
     this.setPixel(x1, y1, this.getPixel(x2, y2));
     this.setPixel(x2, y2, pixel);
+  }
+
+  // Load saved state
+  loadSavedGrid() {
+    this.grid = [...savedArray];
+    this.readyReadGrid();
+  }
+
+  // save current state
+  saveState() {
+    savedArray = [...this.grid];
   }
 
   // Return "grid" values as one array
