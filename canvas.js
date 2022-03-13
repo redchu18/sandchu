@@ -42,11 +42,11 @@ const mouse = {
 const gameState = {
   pause: false
 }
-const gridWidth = 400;
-const gridHeight = 300;
+const gridWidth = 12;
+const gridHeight = 9;
 const imageData = ctx.createImageData(gridWidth, gridHeight);
 const colorGrid = new ColorGrid(gridWidth, gridHeight);
-colorGrid.loadSavedGrid();
+// colorGrid.loadSavedGrid();
 paintCanvas(canvas);
 
 
