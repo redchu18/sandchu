@@ -55,7 +55,7 @@ const elementProps = {
     rigid: true,
     hidden: true,
     class: 'plant',
-    flammability: .5
+    flammability: .1
   },
   13: {
     name: 'Pink Petal',
@@ -64,7 +64,7 @@ const elementProps = {
     rigid: true,
     hidden: true,
     class: 'plant',
-    flammability: .5
+    flammability: .1
   },
   12: {
     name: 'Blue Petal',
@@ -73,7 +73,7 @@ const elementProps = {
     rigid: true,
     hidden: true,
     class: 'plant',
-    flammability: .5
+    flammability: .1
   },
   11: {
     name: 'Yellow Petal',
@@ -82,7 +82,7 @@ const elementProps = {
     rigid: true,
     hidden: true,
     class: 'plant',
-    flammability: .5
+    flammability: .1
   },
   10: {
     name: 'Red Petal',
@@ -91,7 +91,7 @@ const elementProps = {
     rigid: true,
     hidden: true,
     class: 'plant',
-    flammability: .5
+    flammability: .1
   },
   9: {
     name: 'Flower Stem',
@@ -100,7 +100,7 @@ const elementProps = {
     density: 1,
     hidden: true,
     class: 'plant',
-    flammability: .5,
+    flammability: .1
   },
   8: {
     name: 'Growing Flower',
@@ -121,7 +121,7 @@ const elementProps = {
     color: [140, 155, 90, 255],
     rigid: false,
     density: 1,
-    flammability: .05
+    flammability: .1
   },
   6: {
     name : 'Dirt',
@@ -136,7 +136,8 @@ const elementProps = {
     rigid : false,
     density: 0,
     burnRate: .04,
-    riseRate: .8
+    riseRate: .8,
+    slowRate: .3
   },
   4: {
     name : 'Oil',
