@@ -160,6 +160,7 @@ function handlePixel(x, y, dir) {
     case dirtId:
     case seedId:
     case ashId:
+    case ablazeCharcoalId:
       handleSolid(x, y, dir, pixelId);
       break;
     case waterId:
@@ -180,7 +181,6 @@ function handlePixel(x, y, dir) {
     case purplePetalId:
       handlePlantMatter(x, y, pixelId);
       break;
-    case ablazeCharcoalId:
     case ablazePlantId:
       handleAblazeElements(x, y, pixelId);
   }
@@ -254,7 +254,6 @@ function handleGrowingFlower(x, y, dir, pixelId) {
   }
 }
 
-// fix spaghetti code here
 function bloomFLower(x, y, pixelId) {
   colorGrid.setPixel(x, y, flowerStemId);
   const flowerPetalId = pickRandomFlowerPetalId();
@@ -290,11 +289,14 @@ function pickRandomFlowerPetalId() {
 }
 
 function handleFire(x, y, dir, fireId) {
+  let rise = true;
   if (fireShouldDissapear()) {
     colorGrid.setPixel(x, y, emptyId);
     return;
-  } else if (!fireShouldRise()) {
+  } else if (fireShouldSlow()) {
     return;
+  } else if (!fireShouldRise()) {
+    rise = false;
   }
 
   const top = shouldSwapFire(x, y - 1);
@@ -302,9 +304,9 @@ function handleFire(x, y, dir, fireId) {
   const topRight = shouldSwapFire(x +  1, y - 1);
   const left = shouldSwapFire(x - 1, y);
   const right = shouldSwapFire(x + 1, y);
-  if (top) {
+  if (top && rise) {
     colorGrid.swapPixel(x, y, x, y - 1);
-  } else if (topLeft || topRight) {
+  } else if (topLeft && rise || topRight && rise) {
     if (topLeft && topRight) {
       colorGrid.swapPixel(x, y, x + dir, y - 1);
     } else if (topLeft) {
@@ -337,6 +339,10 @@ function handleSolid(x, y, dir, pixelId) {
   if (shouldDissapear(x, y, pixelId)) {
     colorGrid.setPixel(x, y, emptyId);
     return;
+  }
+
+  if (pixelId == ablazeCharcoalId) {
+    handleAblazeElements(x, y, pixelId);
   }
 
   const bottom = shouldSwap(pixelId, x, y + 1)
@@ -439,6 +445,10 @@ function fireShouldRise() {
 
 function fireShouldDissapear() {
   return Math.random() < elementProps[fireId].burnRate;
+}
+
+function fireShouldSlow() {
+  return Math.random() < elementProps[fireId].slowRate;
 }
 
 function hasAdjacentPixel(x, y, pixelId) {
